@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   host: 'monorail.proxy.rlwy.net', // Isso pode não ser apropriado para o host do banco de dados em nuvem
   user: 'root',
   password: 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
-  database: 'ecomerce',
+  database: 'usuarios_ecom',
   port: 17931,
   connectTimeout: 60000,
 });
