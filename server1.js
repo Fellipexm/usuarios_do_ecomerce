@@ -7,7 +7,7 @@ const port = 3080;
 
 // Configuração do banco de dados
 const connection = mysql.createConnection({
-  host: 'monorail.proxy.rlwy.net', // Isso pode não ser apropriado para o host do banco de dados em nuvem
+  host: 'monorail.proxy.rlwy.net',
   user: 'root',
   password: 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
   database: 'ecomerce',
@@ -34,9 +34,7 @@ app.use(express.json());
 app.post('/api/gravar-dados', (req, res) => {
   const { nome, gmail, senha } = req.body;
 
-  // Verificar se os campos obrigatórios estão presentes e não são nulos ou vazios
   if (nome && gmail && senha) {
-    // Lógica para verificar duplicatas e realizar a inserção no banco de dados
     const queryInsert = 'INSERT INTO usuarios (nome, gmail, senha) VALUES (?, ?, ?)';
     connection.query(queryInsert, [nome, gmail, senha], (err, results) => {
       if (err) {
@@ -54,7 +52,6 @@ app.post('/api/gravar-dados', (req, res) => {
 
 // Rota para obter dados dos usuários
 app.get('/api/listar-usuarios', (req, res) => {
-  // Lógica para recuperar dados dos usuários do banco de dados
   const querySelect = 'SELECT * FROM usuarios';
   connection.query(querySelect, (err, results) => {
     if (err) {
@@ -65,6 +62,31 @@ app.get('/api/listar-usuarios', (req, res) => {
       res.status(200).json({ usuarios: results });
     }
   });
+});
+
+// Rota para atualizar senha
+app.post('/api/atualizar-senha', (req, res) => {
+  const { userId, newPassword } = req.body;
+
+  if (userId && newPassword) {
+    const queryUpdate = 'UPDATE usuarios SET senha = ? WHERE id = ?';
+    connection.query(queryUpdate, [newPassword, userId], (err, results) => {
+      if (err) {
+        console.error('Erro ao atualizar senha:', err);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+      } else {
+        if (results.affectedRows > 0) {
+          console.log('Senha atualizada com sucesso');
+          res.status(200).json({ success: true, message: 'Senha atualizada com sucesso' });
+        } else {
+          console.log('Usuário não encontrado');
+          res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+      }
+    });
+  } else {
+    res.status(400).json({ error: 'Os campos userId e newPassword são obrigatórios' });
+  }
 });
 
 // Modificação para escutar em todos os IPs disponíveis
