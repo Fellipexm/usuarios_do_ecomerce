@@ -3,40 +3,31 @@ const cors = require('cors');
 const mysql = require('mysql2');
 
 const app = express();
-const port = 3080;
+const port = process.env.PORT || 3000;
 
-// Configuração do banco de dados
+// Configuração para o serviço ClearDB no Heroku (ou outro serviço de banco de dados em nuvem)
 const connection = mysql.createConnection({
-  host: 'monorail.proxy.rlwy.net', // Isso pode não ser apropriado para o host do banco de dados em nuvem
-  user: 'root',
-  password: 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
-  database: 'usuarios_ecom',
-  port: 17931,
-  connectTimeout: 60000,
+  host: process.env.CLEARDB_HOST || 'seu-endpoint-do-cleardb.herokuapp.com',
+  user: process.env.CLEARDB_USER || 'root',
+  password: process.env.CLEARDB_PASSWORD || 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
+  database: process.env.CLEARDB_DATABASE || 'usuarios_ecom',
 });
 
-// Conectar ao banco de dados
-connection.connect(err => {
+connection.connect((err) => {
   if (err) {
     console.error('Erro ao conectar ao MySQL:', err);
   } else {
-    console.log('Conectado ao MySQL');
+    console.log('Conectado ao MySQL!');
   }
 });
 
-// Middleware CORS
 app.use(cors());
-
-// Middleware para análise de corpos de solicitação JSON
 app.use(express.json());
 
-// Rota para gravar dados
 app.post('/api/gravar-dados', (req, res) => {
   const { nome, gmail, senha } = req.body;
 
-  // Verificar se os campos obrigatórios estão presentes e não são nulos ou vazios
   if (nome && gmail && senha) {
-    // Lógica para verificar duplicatas e realizar a inserção no banco de dados
     const queryInsert = 'INSERT INTO usuarios (nome, gmail, senha) VALUES (?, ?, ?)';
     connection.query(queryInsert, [nome, gmail, senha], (err, results) => {
       if (err) {
@@ -52,9 +43,7 @@ app.post('/api/gravar-dados', (req, res) => {
   }
 });
 
-// Rota para obter dados dos usuários
 app.get('/api/listar-usuarios', (req, res) => {
-  // Lógica para recuperar dados dos usuários do banco de dados
   const querySelect = 'SELECT * FROM usuarios';
   connection.query(querySelect, (err, results) => {
     if (err) {
@@ -67,9 +56,6 @@ app.get('/api/listar-usuarios', (req, res) => {
   });
 });
 
-// Modificação para escutar em todos os IPs disponíveis
-const server = app.listen(port, '0.0.0.0', () => {
-  const host = server.address().address;
-  const port = server.address().port;
-  console.log(`Servidor rodando em http://${host}:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Servidor rodando na porta ${port}`);
 });
