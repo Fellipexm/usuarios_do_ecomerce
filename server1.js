@@ -1,16 +1,17 @@
 const express = require('express');
-const cors = require('cors');
 const mysql = require('mysql2');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuração para o serviço ClearDB no Heroku (ou outro serviço de banco de dados em nuvem)
 const connection = mysql.createConnection({
-  host: process.env.CLEARDB_HOST || 'monorail.proxy.rlwy.net',
-  user: process.env.CLEARDB_USER || 'root',
-  password: process.env.CLEARDB_PASSWORD || 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
-  database: process.env.CLEARDB_DATABASE || 'usuarios_ecom',
+  host: 'monorail.proxy.rlwy.net', // Isso pode não ser apropriado para o host do banco de dados em nuvem
+  user: 'root',
+  password: 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
+  database: '`usuarios_ecom`',
+  port: 17931,
+  connectTimeout: 60000,
 });
 
 connection.connect((err) => {
@@ -24,34 +25,28 @@ connection.connect((err) => {
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/gravar-dados', (req, res) => {
-  const { nome, gmail, senha } = req.body;
+app.get('/games', (req, res) => {
+  const query = 'SELECT * FROM jogos';
 
-  if (nome && gmail && senha) {
-    const queryInsert = 'INSERT INTO usuarios (nome, gmail, senha) VALUES (?, ?, ?)';
-    connection.query(queryInsert, [nome, gmail, senha], (err, results) => {
-      if (err) {
-        console.error('Erro ao gravar dados:', err);
-        res.status(500).json({ error: 'Erro interno do servidor' });
-      } else {
-        console.log('Dados gravados com sucesso');
-        res.status(200).json({ message: 'Dados gravados com sucesso' });
-      }
-    });
-  } else {
-    res.status(400).json({ error: 'Os campos nome, gmail e senha são obrigatórios' });
-  }
-});
-
-app.get('/api/listar-usuarios', (req, res) => {
-  const querySelect = 'SELECT * FROM usuarios';
-  connection.query(querySelect, (err, results) => {
+  connection.query(query, (err, results) => {
     if (err) {
-      console.error('Erro ao listar usuários:', err);
+      console.error('Erro ao executar a query de jogos:', err);
       res.status(500).json({ error: 'Erro interno do servidor' });
     } else {
-      console.log('Usuários listados com sucesso');
-      res.status(200).json({ usuarios: results });
+      res.json(results);
+    }
+  });
+});
+
+app.get('/consoles', (req, res) => {
+  const query = 'SELECT * FROM console';
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('Erro ao executar a query de consoles:', err);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    } else {
+      res.json(results);
     }
   });
 });
