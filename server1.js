@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 // Configuração para o serviço ClearDB no Heroku (ou outro serviço de banco de dados em nuvem)
 const connection = mysql.createConnection({
-  host: process.env.CLEARDB_HOST || 'seu-endpoint-do-cleardb.herokuapp.com',
+  host: process.env.CLEARDB_HOST || 'monorail.proxy.rlwy.net',
   user: process.env.CLEARDB_USER || 'root',
   password: process.env.CLEARDB_PASSWORD || 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
   database: process.env.CLEARDB_DATABASE || 'usuarios_ecom',
