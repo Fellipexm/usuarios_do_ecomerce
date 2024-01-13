@@ -3,14 +3,16 @@ const cors = require('cors');
 const mysql = require('mysql2');
 
 const app = express();
-const port = 3000;
+const port = 3080;
 
 // Configuração do banco de dados
 const connection = mysql.createConnection({
-  host: 'localhost',
+  host: 'monorail.proxy.rlwy.net', // Isso pode não ser apropriado para o host do banco de dados em nuvem
   user: 'root',
-  password: 'acesso123',
-  database: 'usuarios_ecom',
+  password: 'DaAHccCfDC-BhaF3BEg363aBHe1h4dg-',
+  database: 'ecomerce',
+  port: 17931,
+  connectTimeout: 60000,
 });
 
 // Conectar ao banco de dados
@@ -65,6 +67,9 @@ app.get('/api/listar-usuarios', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+// Modificação para escutar em todos os IPs disponíveis
+const server = app.listen(port, '0.0.0.0', () => {
+  const host = server.address().address;
+  const port = server.address().port;
+  console.log(`Servidor rodando em http://${host}:${port}`);
 });
